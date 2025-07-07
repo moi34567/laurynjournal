@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Journal de Rêves avec Dream Patterns</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #eee;
+      padding: 2rem;
+      max-width: 700px;
+      margin: auto;
+      position: relative;
+    }
+
+    /* Sidebar */
+    #sidebarToggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background-color: #222;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      color: #eee;
+      font-size: 24px;
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 8px rgba(255,255,255,0.2);
+      transition: background-color 0.3s;
+    }
+    #sidebarToggle:hover {
+      background-color: #444;
+    }
+
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 250px;
+      height: 100%;
+      background-color: #222;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.7);
+      padding: 1rem;
+      box-sizing: border-box;
+      overflow-y: auto;
+      transition: left 0.3s ease;
+      z-index: 1000;
+    }
+    #sidebar.open {
+      left: 0;
+    }
+
+    #sidebar h2 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-weight: normal;
+      border-bottom: 1px solid #444;
+      padding-bottom: 0.5rem;
+    }
+
+    #tagsList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #tagsList li {
+      background-color: #333;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+      display: inline-block;
+      user-select: none;
+      color: #ccc;
+      transition: background-color 0.3s, color 0.3s;
+      font-size: 0.9rem;
+      position: relative;
+    }
+    #tagsList li.selected {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    #tagsList li .count {
+      background-color: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      color: #222;
+      font-weight: bold;
+      font-size: 0.8rem;
+      padding: 0 7px;
+      margin-left: 8px;
+      vertical-align: middle;
+      display: inline-block;
+      min-width: 22px;
+      text-align: center;
+    }
+
+    /* Main content */
+    #mainApp {
+      padding-left: 0;
+      transition: padding-left 0.3s ease;
+    }
+    #mainApp.sidebar-open {
+      padding-left: 260px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-left: 55px; /* décalage pour ne pas cacher la lune */
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h1 span.emoji {
+      font-size: 2rem;
+    }
+
+    .textarea-wrapper {
+      position: relative;
+      margin-top: 1rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 1rem;
+      background-color: #222;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 8px;
+      box-sizing: border-box;
+      resize: vertical;
+      font-size: 1rem;
+    }
+
+    .icon-btn {
+      position: absolute;
+      bottom: 10px;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.3s;
+      fill: #ccc;
+      stroke: #ccc;
+    }
+
+    .icon-btn:hover {
+      opacity: 1;
+    }
+
+    .clear-icon {
+      right: 40px;
+    }
+
+    .micro-icon {
+      right: 10px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      margin-top: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+    }
+
+    .delete-btn,
+    .delete-dream-btn,
+    .delete-all-btn {
+      background-color: #e74c3c;
+    }
+
+    .delete-btn:hover,
+    .delete-dream-btn:hover,
+    .delete-all-btn:hover {
+      background-color: #c0392b;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+
+    li {
+      background-color: #1e1e1e;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+      overflow-x: hidden;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      position: relative;
+      padding-right: 1rem; /* Laisser la place au bouton */
+    }
+
+    li div.date {
+      font-size: 0.8rem;
+      color: #aaa;
+      margin-top: 0.5rem;
+    }
+
+    .delete-dream-btn {
+      border: none;
+      color: white;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 0;
+      clear: none;
+      float: none;
+      display: inline-block;
+    }
+
+    /* Nouveau conteneur pour date + bouton */
+    .date-and-delete {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    #filterSelect {
+      margin-top: 1rem;
+      background-color: #222;
+      color: #eee;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 0.3rem 0.6rem;
+      font-size: 1rem;
+    }
+
+    /* Scrollbar pour sidebar */
+    #sidebar::-webkit-scrollbar {
+      width: 8px;
+    }
+    #sidebar::-webkit-scrollbar-thumb {
+      background-color: #444;
+      border-radius: 4px;
+    }
+    #sidebar::-webkit-scrollbar-track {
+      background-color: #222;
+    }
+
+    /* Password container */
+    #authContainer {
+      max-width: 300px;
+      margin: 4rem auto;
+      text-align: center;
+    }
+
+    #authContainer input[type="password"] {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background-color: #222;
+      color: #eee;
+    }
+
+    #authContainer button {
+      margin-top: 1rem;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <button id="sidebarToggle" aria-label="Ouvrir/fermer la liste des tags">☰</button>
+
+  <div id="sidebar" aria-label="Liste des Dream Patterns (tags)">
+    <h2>Dream Patterns</h2>
+    <ul id="tagsList"></ul>
+  </div>
+
+  <div id="authContainer">
+    <h2>🔒 Accès sécurisé</h2>
+    <input type="password" id="passwordInput" placeholder="Mot de passe" autocomplete="off" />
+    <button onclick="checkPassword()">Connexion</button>
+  </div>
+
+  <div id="mainApp" style="display: none;">
+    <h1><span class="emoji">🌙</span> Mon Journal de Rêves</h1>
+
+    <div class="textarea-wrapper">
+      <textarea id="dreamInput" placeholder="Écris ton rêve ici..."></textarea>
+
+      <!-- Croix SVG -->
+      <svg class="icon-btn clear-icon" onclick="clearText()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" >
+        <path d="M18 6L6 18M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+
+      <!-- Micro SVG -->
+      <svg class="icon-btn micro-icon" onclick="startDictation()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3zm5 10a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 10v-3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <label>
+      <input type="checkbox" id="lucidCheckbox" /> 🌟 C'était un rêve lucide
+    </label><br />
+
+    <button onclick="saveDream()">💾 Sauvegarder</button>
+    <button onclick="exportDreams()">📥 Exporter en fichier texte</button>
+    <button class="delete-all-btn" onclick="confirmDeleteAll()">🗑️ Supprimer tous les rêves</button>
+
+    <h2>Mes Rêves</h2>
+    <label for="filterSelect">🔍 Filtrer :</label>
+    <select id="filterSelect" onchange="loadDreams()">
+      <option value="all">Tous</option>
+      <option value="lucid">Lucides seulement</option>
+      <option value="non-lucid">Non lucides</option>
+    </select>
+    <ul id="dreamList"></ul>
+  </div>
+
+  <script>
+    const PASSWORD = "Lauryn";
+
+    const sidebarToggle = document.getElementById("sidebarToggle");
+    const sidebar = document.getElementById("sidebar");
+    const mainApp = document.getElementById("mainApp");
+    const dreamInput = document.getElementById("dreamInput");
+    const lucidCheckbox = document.getElementById("lucidCheckbox");
+    const dreamList = document.getElementById("dreamList");
+    const filterSelect = document.getElementById("filterSelect");
+    const tagsList = document.getElementById("tagsList");
+
+    let selectedTags = [];
+
+    sidebarToggle.addEventListener("click", () => {
+      sidebar.classList.toggle("open");
+      mainApp.classList.toggle("sidebar-open");
+    });
+
+    function checkPassword() {
+      const input = document.getElementById("passwordInput").value;
+      if (input === PASSWORD) {
+        document.getElementById("authContainer").style.display = "none";
+        mainApp.style.display = "block";
+        loadDreams();
+        loadTags();
+      } else {
+        alert("Mot de passe incorrect.");
+      }
+    }
+
+    function saveDream() {
+      const text = dreamInput.value.trim();
+      const isLucid = lucidCheckbox.checked;
+      if (!text) return;
+
+      // Extraire les tags (#mot) du texte
+      const tags = extractTags(text);
+
+      const date = new Date().toISOString();
+
+      const dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
+      dreams.unshift({ text, date, lucid: isLucid, tags });
+      localStorage.setItem("dreams", JSON.stringify(dreams));
+      dreamInput.value = "";
+      lucidCheckbox.checked = false;
+      loadDreams();
+      loadTags();
+    }
+
+    function extractTags(text) {
+      // Extrait les mots précédés de # (hashtags)
+      // Ex: "Je rêve de #ski et #montagne" => ["ski", "montagne"]
+      const regex = /#(\w+)/g;
+      let match;
+      const tags = [];
+      while ((match = regex.exec(text)) !== null) {
+        tags.push(match[1].toLowerCase());
+      }
+      return tags;
+    }
+
+    function loadDreams() {
+      const dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
+      const filter = filterSelect.value;
+
+      dreamList.innerHTML = "";
+
+      // Appliquer filtre lucide/non-lucide
+      let filteredDreams = dreams.filter(dream => {
+        if (filter === "lucid") return dream.lucid;
+        if (filter === "non-lucid") return !dream.lucid;
+        return true;
+      });
+
+      // Appliquer filtre tags (intersection) : garder que rêves qui contiennent TOUS les tags sélectionnés
+      if (selectedTags.length > 0) {
+        filteredDreams = filteredDreams.filter(dream =>
+          selectedTags.every(tag => dream.tags && dream.tags.includes(tag))
+        );
+      }
+
+      // Trier par date décroissante (du plus récent au plus vieux)
+      filteredDreams.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      filteredDreams.forEach((dream, index) => {
+        const li = document.createElement("li");
+        // Afficher le texte du rêve avec les tags en couleur (optionnel)
+        let displayedText = dream.text;
+        // Remplacer hashtags par span stylisé
+        displayedText = displayedText.replace(/#(\w+)/g, '<span style="color:#4CAF50;">#$1</span>');
+
+        li.innerHTML = `
+          <div>${displayedText}</div>
+          <div class="date-and-delete">
+            <span class='date'>${new Date(dream.date).toLocaleString()}${dream.lucid ? " 🌟 Rêve lucide" : ""}</span>
+            <button class='delete-dream-btn delete-btn' onclick='deleteDream(${index})' title="Supprimer ce rêve">Supprimer</button>
+          </div>
+        `;
+        dreamList.appendChild(li);
+      });
+    }
+
+    function loadTags() {
+      const dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
+      const tagCountMap = {};
+
+      dreams.forEach(dream => {
+        if (!dream.tags) return;
+        dream.tags.forEach(tag => {
+          tagCountMap[tag] = (tagCountMap[tag] || 0) + 1;
+        });
+      });
+
+      // Convertir en tableau trié par nombre d'apparitions décroissant
+      const sortedTags = Object.entries(tagCountMap)
+        .sort((a, b) => b[1] - a[1]);
+
+      tagsList.innerHTML = "";
+
+      sortedTags.forEach(([tag, count]) => {
+        const li = document.createElement("li");
+        li.textContent = tag;
+        li.className = selectedTags.includes(tag) ? "selected" : "";
+        const countSpan = document.createElement("span");
+        countSpan.className = "count";
+        countSpan.textContent = count;
+        li.appendChild(countSpan);
+        li.addEventListener("click", () => {
+          toggleTag(tag);
+        });
+        tagsList.appendChild(li);
+      });
+    }
+
+    function toggleTag(tag) {
+      if (selectedTags.includes(tag)) {
+        selectedTags = selectedTags.filter(t => t !== tag);
+      } else {
+        selectedTags.push(tag);
+      }
+      loadTags();
+      loadDreams();
+    }
+
+    function deleteDream(index) {
+      if (!confirm("Tu es sûr de vouloir supprimer ce rêve ?")) return;
+      const dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
+      dreams.splice(index, 1);
+      localStorage.setItem("dreams", JSON.stringify(dreams));
+      loadDreams();
+      loadTags();
+    }
+
+    function confirmDeleteAll() {
+      if (!confirm("Supprimer TOUS les rêves ? Cette action est irréversible.")) return;
+      localStorage.removeItem("dreams");
+      selectedTags = [];
+      loadDreams();
+      loadTags();
+    }
+
+    function exportDreams() {
+      const dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
+      if (dreams.length === 0) {
+        alert("Aucun rêve à exporter !");
+        return;
+      }
+      let content = "Journal de Rêves \n\n";
+      // Tri par date croissante pour export plus naturel
+      const sortedDreams = [...dreams].sort((a, b) => new Date(a.date) - new Date(b.date));
+      sortedDreams.forEach((dream, index) => {
+        const num = index + 1;
+        const tagsText = dream.tags && dream.tags.length > 0 ? ` [Tags: ${dream.tags.join(", ")}]` : "";
+        content += `Rêve #${num}\nDate : ${new Date(dream.date).toLocaleString()}${dream.lucid ? " (Lucide)" : ""}${tagsText}\n${dream.text}\n\n`;
+      });
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "journal_de_reves.txt";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function clearText() {
+      dreamInput.value = "";
+    }
+
+    function startDictation() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'fr-FR';
+      recognition.interimResults = true;
+      recognition.continuous = false;
+
+      let finalTranscript = dreamInput.value;
+
+      recognition.onresult = function (event) {
+        let interimTranscript = "";
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const result = event.results[i];
+          if (result.isFinal) {
+            finalTranscript += (finalTranscript && !finalTranscript.endsWith(" ") ? " " : "") + result[0].transcript;
+          } else {
+            interimTranscript += result[0].transcript;
+          }
+        }
+
+        dreamInput.value = finalTranscript + (interimTranscript ? " " + interimTranscript : "");
+      };
+
+      recognition.onend = function () {
+        dreamInput.value = finalTranscript.trim();
+      };
+
+      recognition.onerror = function (event) {
+        alert("Erreur de reconnaissance vocale : " + event.error);
+      };
+
+      recognition.start();
+    }
+  </script>
+</body>
+  </html>
