@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mise à jour</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #eee;
+    margin: 0; padding: 0;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  /* Fond modal */
+  #modalOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+  }
+  /* La pop-up */
+  #modal {
+    background: #222;
+    border-radius: 10px;
+    padding: 2rem;
+    max-width: 400px;
+    box-shadow: 0 0 15px #4CAF50;
+    text-align: center;
+  }
+  #modal h2 {
+    margin-top: 0;
+    color: #4CAF50;
+  }
+  #modal p {
+    margin: 1rem 0 2rem;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+  #modal button {
+    padding: 0.6rem 1.4rem;
+    margin: 0 0.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  #btnYes {
+    background-color: #4CAF50;
+    color: white;
+  }
+  #btnYes:hover {
+    background-color: #45a049;
+  }
+  #btnNo {
+    background-color: #e74c3c;
+    color: white;
+  }
+  #btnNo:hover {
+    background-color: #c0392b;
+  }
+  /* Écran de chargement */
+  #loadingScreen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #222;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 20;
+  }
+  #loadingText {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #4CAF50;
+  }
+  /* Barre de progression */
+  #progressBarContainer {
+    width: 80%;
+    background: #444;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 20px;
+  }
+  #progressBar {
+    height: 100%;
+    width: 0;
+    background: #4CAF50;
+    transition: width 0.1s linear;
+  }
+</style>
+</head>
+<body>
+
+<div id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+  <div id="modal">
+    <h2 id="modalTitle">Nouvelle mise à jour disponible !</h2>
+    <p id="modalDesc">
+      Voici les améliorations :<br>
+      - Fonctionnalités avancées de statistiques des rêves<br>
+      - Exportation au format .txt<br>
+      - Correction de bugs<br>
+    </p>
+    <button id="btnYes">Oui, installer</button>
+    <button id="btnNo">Non, plus tard</button>
+  </div>
+</div>
+
+<div id="loadingScreen" aria-live="polite" aria-busy="true" aria-label="Écran de chargement">
+  <div id="loadingText">Installation en cours...</div>
+  <div id="progressBarContainer">
+    <div id="progressBar"></div>
+  </div>
+</div>
+
+<script>
+  const urlYes = "https://moi34567.github.io/Dream-journall/Final.html"; // Modifie ici le lien quand installation réussie
+  const urlNo = "https://moi34567.github.io/Dream-journall/Test13.html"; // Modifie ici le lien quand on refuse la maj
+
+  const modalOverlay = document.getElementById("modalOverlay");
+  const btnYes = document.getElementById("btnYes");
+  const btnNo = document.getElementById("btnNo");
+  const loadingScreen = document.getElementById("loadingScreen");
+  const progressBar = document.getElementById("progressBar");
+
+  btnYes.addEventListener("click", () => {
+    // Masquer la modal
+    modalOverlay.style.display = "none";
+    // Afficher l'écran de chargement
+    loadingScreen.style.display = "flex";
+
+    let progress = 0;
+    const duration = 5000; // 5 secondes
+    const intervalTime = 50;
+    const step = (intervalTime / duration) * 100;
+
+    const interval = setInterval(() => {
+      progress += step;
+      if (progress > 100) progress = 100;
+      progressBar.style.width = progress + "%";
+
+      if (progress >= 100) {
+        clearInterval(interval);
+        // Après chargement, rediriger
+        window.location.href = urlYes;
+      }
+    }, intervalTime);
+  });
+
+  btnNo.addEventListener("click", () => {
+    window.location.href = urlNo;
+  });
+</script>
+
+</body>
+</html>
