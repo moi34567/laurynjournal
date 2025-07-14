@@ -90,14 +90,14 @@
 </div>
 
 <script>
-function startUpdate() {
+alert("Voici les nouveautés de cette mise à jour :\n\n- Nouveau système de tags\n- Statistiques améliorées\n- Interface optimisée\n\nTu peux consulter les détails en ligne.");
+  function startUpdate() {
   document.getElementById("popup").style.display = "none";
   document.getElementById("loadingScreen").style.display = "block";
   fakeProgress();
 }
 
 function showInfo() {
-  alert("Voici les nouveautés de cette mise à jour :\n\n- Nouveau système de tags\n- Statistiques améliorées\n- Interface optimisée\n\nTu peux consulter les détails en ligne.");
   window.location.href = "https://moi34567.github.io/laurynjournal/Dreams.html";
 }
 
@@ -105,7 +105,7 @@ let progress = 0;
 
 function fakeProgress() {
   if (progress >= 100) {
-    window.location.href = "https://moi34567.github.io/laurynjournal/Dreamsnew.html";
+      window.location.href = "https://moi34567.github.io/laurynjournal/Dreamsnew.html";
     return;
   }
 
