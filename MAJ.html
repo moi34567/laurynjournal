@@ -1,124 +1,177 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mise à jour disponible</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: #eee;
-      margin: 0;
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    #popup, #loadingScreen {
-      background-color: #222;
-      border-radius: 10px;
-      padding: 2rem;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    }
-
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 0.6rem 1.2rem;
-      margin: 0.5rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background-color 0.3s, transform 0.3s;
-    }
-
-    button:hover {
-      background-color: #45a049;
-      transform: scale(1.05);
-    }
-
-    .cancel {
-      background-color: #e74c3c;
-    }
-
-    .cancel:hover {
-      background-color: #c0392b;
-    }
-
-    #progressContainer {
-      background-color: #333;
-      height: 20px;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 2rem;
-    }
-
-    #progressBar {
-      background-color: #4CAF50;
-      height: 100%;
-      width: 0%;
-      transition: width 0.2s;
-    }
-
-    #updateText {
-      margin-top: 1.5rem;
-      font-size: 0.95rem;
-      color: #ccc;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mise à jour</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #eee;
+    margin: 0; padding: 0;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  /* Fond modal */
+  #modalOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+  }
+  /* La pop-up */
+  #modal {
+    background: #222;
+    border-radius: 10px;
+    padding: 2rem;
+    max-width: 400px;
+    box-shadow: 0 0 15px #4CAF50;
+    text-align: center;
+  }
+  #modal h2 {
+    margin-top: 0;
+    color: #4CAF50;
+  }
+  #modal p {
+    margin: 1rem 0 2rem;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+  #modal button {
+    padding: 0.6rem 1.4rem;
+    margin: 0 0.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  #btnYes {
+    background-color: #4CAF50;
+    color: white;
+  }
+  #btnYes:hover {
+    background-color: #45a049;
+  }
+  #btnNo {
+    background-color: #e74c3c;
+    color: white;
+  }
+  #btnNo:hover {
+    background-color: #c0392b;
+  }
+  /* Écran de chargement */
+  #loadingScreen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #222;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 20;
+  }
+  #loadingText {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #4CAF50;
+  }
+  /* Barre de progression */
+  #progressBarContainer {
+    width: 80%;
+    background: #444;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 20px;
+  }
+  #progressBar {
+    height: 100%;
+    width: 0;
+    background: #4CAF50;
+    transition: width 0.1s linear;
+  }
+</style>
 </head>
 <body>
 
-<div id="popup">
-  <h2>🔧 Mise à jour disponible</h2>
-  <p>Souhaitez-vous installer la dernière version ?</p>
-  <button onclick="startUpdate()">Oui</button>
-  <button class="cancel" onclick="showInfo()">Non</button>
+<div id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+  <div id="modal">
+    <h2 id="modalTitle">Nouvelle mise à jour disponible !</h2>
+    <p id="modalDesc">
+      Voici les améliorations :<br>
+      - Meilleure performance<br>
+      - Interface améliorée<br>
+      - Correction de bugs<br>
+      - Nouvelles fonctionnalités à venir
+    </p>
+    <button id="btnYes">Oui, installer</button>
+    <button id="btnNo">Non, plus tard</button>
+  </div>
 </div>
 
-<div id="loadingScreen" style="display:none;">
-  <h2>📦 Installation de la mise à jour...</h2>
-  <div id="progressContainer">
+<div id="loadingScreen" aria-live="polite" aria-busy="true" aria-label="Écran de chargement">
+  <div id="loadingText">Installation en cours...</div>
+  <div id="progressBarContainer">
     <div id="progressBar"></div>
   </div>
 </div>
 
 <script>
-alert("Voici les nouveautés de cette mise à jour :\n\n- Nouveau système de tags\n- Statistiques améliorées\n- Interface optimisée\n\nTu peux consulter les détails en ligne.");
-  function startUpdate() {
-  document.getElementById("popup").style.display = "none";
-  document.getElementById("loadingScreen").style.display = "block";
-  fakeProgress();
-}
+  const urlYes = "https://moi34567.github.io/laurynjournal/Dreamsnew.html"; // Remplace par ton vrai lien
+  const urlNo = "https://moi34567.github.io/laurynjournal/Dreams.html"; // Remplace par ton autre lien
 
-function showInfo() {
-  window.location.href = "https://moi34567.github.io/laurynjournal/Dreams.html";
-}
+  const modalOverlay = document.getElementById("modalOverlay");
+  const btnYes = document.getElementById("btnYes");
+  const btnNo = document.getElementById("btnNo");
+  const loadingScreen = document.getElementById("loadingScreen");
+  const progressBar = document.getElementById("progressBar");
 
-let progress = 0;
+  btnYes.addEventListener("click", () => {
+    modalOverlay.style.display = "none";
+    loadingScreen.style.display = "flex";
 
-function fakeProgress() {
-  if (progress >= 100) {
-      window.location.href = "https://moi34567.github.io/laurynjournal/Dreamsnew.html";
-    return;
-  }
+    let progress = 0;
 
-  let increment = Math.random() * 5;
-  if (progress > 90) increment = Math.random() * 1;
-  if (progress > 97) increment = Math.random() * 0.2;
+    function updateProgress() {
+      if (progress >= 100) {
+       alert("Mise à jour terminée/n/n Demandes moi si tu veux que je t'explique les nouvelles fonctionalitées");
+        window.location.href = urlYes;
+        return;
+      }
 
-  progress = Math.min(progress + increment, 100);
-  document.getElementById("progressBar").style.width = progress + "%";
+      let increment = 0;
+      if (progress < 30) {
+        increment = Math.random() * 4 + 1; // rapide au début
+      } else if (progress < 70) {
+        increment = Math.random() * 2 + 0.5;
+      } else if (progress < 90) {
+        increment = Math.random() * 1 + 0.2;
+      } else if (progress < 98) {
+        increment = Math.random() * 0.5;
+      } else {
+        increment = Math.random() * 0.2;
+      }
 
-  const delay = 50 + Math.random() * 250;
-  setTimeout(fakeProgress, delay);
-}
+      progress = Math.min(progress + increment, 100);
+      progressBar.style.width = progress + "%";
+
+      const delay = 50 + Math.random() * 200;
+      setTimeout(updateProgress, delay);
+    }
+
+    updateProgress();
+  });
+
+  btnNo.addEventListener("click", () => {
+    window.location.href = urlNo;
+  });
 </script>
 
 </body>
