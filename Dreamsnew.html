@@ -396,7 +396,7 @@ label {
     <li>Utilise <b>#tags</b> dans ton texte pour organiser tes rêves (par ex. : <span style="color:#4CAF50;">#voler</span>).</li>
     <li>Double-clique sur un rêve pour le modifier.</li>
     <li>Filtre par tags ou type de rêve avec la barre latérale et le menu déroulant.</li>
-    <li>Utilise le micro <svg style="height:1em;vertical-align:middle;" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3zm5 10a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 10v-3" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg> pour dicter ton rêve.</li>
+    <li>Utilise le micro <svg style="height:1em;vertical-align:middle;" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3zm5 10a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 10v-3" st[...]</li>
     <li>Exporte tes rêves avec le bouton dédié (l'import est bientôt disponible).</li>
     <li>Supprime un rêve avec "supprimer", ou tous les rêves avec le bouton rouge.</li>
     <li>Consulte les <b>statistiques</b> dans le menu latéral.</li>
@@ -502,9 +502,9 @@ function saveDream() {
   const date = new Date().toISOString();
   const id = Date.now().toString() + Math.random().toString(36).substring(2, 7);
 
-  const dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
+  const dreams = JSON.parse(localStorage.getItem("dreamslauryn") || "[]");
   dreams.unshift({ id, text, date, lucid: isLucid, tags });
-  localStorage.setItem("dreams", JSON.stringify(dreams));
+  localStorage.setItem("dreamslauryn", JSON.stringify(dreams));
 
   dreamInput.value = "";
   lucidCheckbox.checked = false;
@@ -524,7 +524,7 @@ function extractTags(text) {
 }
 
 function loadDreams() {
-  const dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
+  const dreams = JSON.parse(localStorage.getItem("dreamslauryn") || "[]");
   const filter = filterSelect.value;
 
   dreamList.innerHTML = "";
@@ -605,21 +605,21 @@ function loadDreams() {
 }
 
 function updateDreamText(id, newText) {
-  const dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
+  const dreams = JSON.parse(localStorage.getItem("dreamslauryn") || "[]");
   const idx = dreams.findIndex(d => d.id === id);
   if (idx === -1) return;
   dreams[idx].text = newText;
   dreams[idx].tags = extractTags(newText);
-  localStorage.setItem("dreams", JSON.stringify(dreams));
+  localStorage.setItem("dreamslauryn", JSON.stringify(dreams));
   loadTags();
   updateStatsSection();
 }
 
 function deleteDream(id) {
   if (!confirm("Supprimer ce rêve définitivement ?")) return;
-  let dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
+  let dreams = JSON.parse(localStorage.getItem("dreamslauryn") || "[]");
   dreams = dreams.filter(d => d.id !== id);
-  localStorage.setItem("dreams", JSON.stringify(dreams));
+  localStorage.setItem("dreamslauryn", JSON.stringify(dreams));
   loadDreams();
   loadTags();
   updateStatsSection();
@@ -627,14 +627,14 @@ function deleteDream(id) {
 
 function confirmDeleteAll() {
   if (!confirm("Supprimer tous les rêves ? Cette action est irréversible.")) return;
-  localStorage.removeItem("dreams");
+  localStorage.removeItem("dreamslauryn");
   loadDreams();
   loadTags();
   updateStatsSection();
 }
 
 function loadTags() {
-  const dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
+  const dreams = JSON.parse(localStorage.getItem("dreamslauryn") || "[]");
   const tagCounts = {};
   dreams.forEach(dream => {
     if (dream.tags) {
@@ -676,7 +676,7 @@ function loadTags() {
 }
 
 function exportDreams() {
-  const dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
+  const dreams = JSON.parse(localStorage.getItem("dreamslauryn") || "[]");
   if (dreams.length === 0) {
     alert("Aucun rêve à exporter.");
     return;
@@ -711,7 +711,7 @@ importFileInput.addEventListener("change", () => {
     try {
       // Split by separator ---
       const rawDreams = text.split(/\n---\s*\n?/).filter(t => t.trim().length > 0);
-      const dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
+      const dreams = JSON.parse(localStorage.getItem("dreamslauryn") || "[]");
 
       rawDreams.forEach(rawDream => {
         const lines = rawDream.trim().split('\n');
@@ -746,7 +746,7 @@ importFileInput.addEventListener("change", () => {
       // Trier par date décroissante après import
       dreams.sort((a,b) => new Date(b.date) - new Date(a.date));
 
-      localStorage.setItem("dreams", JSON.stringify(dreams));
+      localStorage.setItem("dreamslauryn", JSON.stringify(dreams));
       loadDreams();
       loadTags();
       updateStatsSection();
@@ -768,7 +768,7 @@ function escapeHtml(text) {
 
 // Stats (total, lucides %, etc)
 function calculateStats() {
-  const dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
+  const dreams = JSON.parse(localStorage.getItem("dreamslauryn") || "[]");
 
   const total = dreams.length;
   const lucidCount = dreams.filter(d => d.lucid).length;
@@ -910,4 +910,4 @@ window.addEventListener("load", () => {
 });
 </script>
 </body>
-  </html>
+</html>
