@@ -142,7 +142,9 @@
     function updateProgress() {
       if (progress >= 100) {
        alert("✅ Mise à jour terminée !\nSi tu veux savoir comment marchent les nouvelles fonctionnalités, demande-moi 😉");
-        window.location.href = urlYes;
+       setDone()
+       openLink()
+      
         return;
       }
 
@@ -165,6 +167,23 @@
       const delay = 50 + Math.random() * 200;
       setTimeout(updateProgress, delay);
     }
+    
+    function openLink() {
+    window.location.href = urlYes;
+    }
+
+    // 1. Ajouter done1 dans localStorage
+function setDone() {
+  localStorage.setItem('done1'); // tu peux mettre ce que tu veux comme valeur, ici 'true' pour marquer que c'est fait
+}
+
+// 2. Vérifier si done1 est dans localStorage et lancer une fonction passée en argument
+function checkDone1() {
+  if (localStorage.getItem('done1') === 'true') {
+    openLink()// ta fonction à toi sera appelée ici
+  }
+}
+
 
     updateProgress();
   });
