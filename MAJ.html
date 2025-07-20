@@ -124,8 +124,13 @@
 </div>
 
 <script>
-  const urlYes = "https://moi34567.github.io/laurynjournal/Dreamsnew.html"; // Remplace par ton vrai lien
-  const urlNo = "https://moi34567.github.io/laurynjournal/Dreams.html"; // Remplace par ton autre lien
+  const urlYes = "https://moi34567.github.io/laurynjournal/Dreamsnew.html";
+  const urlNo = "https://moi34567.github.io/laurynjournal/Dreams.html";
+
+  // 1. Vérifier à l'ouverture si la mise à jour est déjà faite
+  if (localStorage.getItem('done1') === 'true') {
+    window.location.href = urlYes;
+  }
 
   const modalOverlay = document.getElementById("modalOverlay");
   const btnYes = document.getElementById("btnYes");
@@ -141,16 +146,17 @@
 
     function updateProgress() {
       if (progress >= 100) {
-       alert("✅ Mise à jour terminée !\nSi tu veux savoir comment marchent les nouvelles fonctionnalités, demande-moi 😉");
-       setDone()
-       openLink()
-      
+        alert("✅ Mise à jour terminée !\nSi tu veux savoir comment marchent les nouvelles fonctionnalités, demande-moi 😉");
+        // 2. Marquer la mise à jour comme faite
+        localStorage.setItem('done1', 'true');
+        // 3. Rediriger
+        window.location.href = urlYes;
         return;
       }
 
       let increment = 0;
       if (progress < 30) {
-        increment = Math.random() * 4 + 1; // rapide au début
+        increment = Math.random() * 4 + 1;
       } else if (progress < 70) {
         increment = Math.random() * 2 + 0.5;
       } else if (progress < 90) {
@@ -167,23 +173,6 @@
       const delay = 50 + Math.random() * 200;
       setTimeout(updateProgress, delay);
     }
-    
-    function openLink() {
-    window.location.href = urlYes;
-    }
-
-    // 1. Ajouter done1 dans localStorage
-function setDone() {
-  localStorage.setItem('done1'); // tu peux mettre ce que tu veux comme valeur, ici 'true' pour marquer que c'est fait
-}
-
-// 2. Vérifier si done1 est dans localStorage et lancer une fonction passée en argument
-function checkDone1() {
-  if (localStorage.getItem('done1') === 'true') {
-    openLink()// ta fonction à toi sera appelée ici
-  }
-}
-
 
     updateProgress();
   });
@@ -191,7 +180,7 @@ function checkDone1() {
   btnNo.addEventListener("click", () => {
     window.location.href = urlNo;
   });
-</script>
+      </script>
 
 </body>
 </html>
