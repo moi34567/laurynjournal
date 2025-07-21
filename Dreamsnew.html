@@ -67,8 +67,8 @@ body {
 #helpPopup {
   display: none;
   position: fixed;
-  top: 45px;
-  left: 20px;
+  top: 35px;
+  left: 5px;
   width: 330px;
   background: #222;
   color: #eee;
@@ -78,12 +78,14 @@ body {
   z-index: 1002;
   border: 1px solid #444;
   font-size: 1rem;
+  max-height: 80vh;
+  overflow-y: auto;
 }
+
 #helpPopup h3 {
   margin-top: 0.2rem;
   font-size: 1.15rem;
   color: #4CAF50;
-  line-height: 1.1;
 
 }
 #helpPopup .close-btn {
@@ -398,7 +400,7 @@ label {
     <li>Utilise <b>#tags</b> dans ton texte pour organiser tes rêves (par ex. : <span style="color:#4CAF50;">#voler</span>).</li>
     <li>Double-clique sur un rêve pour le modifier.</li>
     <li>Filtre par tags ou type de rêve avec la barre latérale et le menu déroulant.</li>
-    <li>Utilise le micro <svg style="height:1em;vertical-align:middle;" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3zm5 10a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 10v-3" st[...]</li>
+   <li>Utilise le micro <svg style="height:1em;vertical-align:middle; fill:#CCC;" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3zm5 10a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 10v-3" stroke="#CCC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> pour dicter ton rêve à la voix.</li>
     <li>Exporte tes rêves avec le bouton dédié (l'import est bientôt disponible).</li>
     <li>Supprime un rêve avec "supprimer", ou tous les rêves avec le bouton rouge.</li>
     <li>Consulte les <b>statistiques</b> dans le menu latéral.</li>
