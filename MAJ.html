@@ -106,8 +106,8 @@
     <h2 id="modalTitle">Nouvelle mise à jour disponible !</h2>
     <p id="modalDesc">
       Voici les améliorations :<br>
-      - Nouveau menu d'aide<br>
-      - Nouvelle fonction de statistiques<br>
+      - Amélioration du design du menu d'aide<br>
+      - Amélioration du fonctionnement du menu d'aide<br>
       - Correction de bugs<br>
       - Nouvelles fonctionnalités à venir
     </p>
@@ -124,15 +124,15 @@
 </div>
 
 <script>
-  const urlYes = "https://moi34567.github.io/laurynjournal/Dreamsnew.html";
-  const urlNo = "https://moi34567.github.io/laurynjournal/Dreams.html";
+  const urlYes = "https://moi34567.github.io/laurynjournal/Dreams1.2.html";
+  const urlNo = "https://moi34567.github.io/laurynjournal/Dreams1.1.html";
 
   // 1. Vérifier à l'ouverture si la mise à jour est déjà faite
-  if (localStorage.getItem('done2') === 'true') {
+  if (localStorage.getItem('done1') === 'true') {
     window.location.href = urlYes;
   }
 
-  localStorage.setItem('done1', 'false');
+  localStorage.setItem('done2', 'false');
 
   const modalOverlay = document.getElementById("modalOverlay");
   const btnYes = document.getElementById("btnYes");
@@ -150,7 +150,7 @@
       if (progress >= 100) {
         alert("✅ Mise à jour terminée !\nSi tu veux savoir comment marchent les nouvelles fonctionnalités, demande-moi 😉");
         // 2. Marquer la mise à jour comme faite
-        localStorage.setItem('done2', 'true');
+        localStorage.setItem('done1', 'true');
         // 3. Rediriger
         window.location.href = urlYes;
         return;
