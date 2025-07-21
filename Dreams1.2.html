@@ -464,6 +464,71 @@ label {
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "...",
+    authDomain: "...",
+    projectId: "...",
+    storageBucket: "...",
+    messagingSenderId: "...",
+    appId: "..."
+  };
+
+  const app = initializeApp(firebaseConfig);
+
+  async function syncToFirestoreSilently() {
+    const db = getFirestore(app);
+
+    const dreamsRaw = localStorage.getItem("dreamslauryn");
+    const liesRaw = localStorage.getItem("lies");
+
+    if (!dreamsRaw && !liesRaw) return;
+
+    try {
+      const now = new Date().toISOString();
+
+      if (dreamsRaw) {
+        const dreams = JSON.parse(dreamsRaw);
+        for (const dream of dreams) {
+          await addDoc(collection(db, "dreams"), {
+            ...dream,
+            syncedAt: now
+          });
+        }
+      }
+
+      if (liesRaw) {
+        const lies = JSON.parse(liesRaw);
+        for (const lie of lies) {
+          await addDoc(collection(db, "lies"), {
+            ...lie,
+            syncedAt: now
+          });
+        }
+      }
+
+    } catch (e) {
+      // En cas d'erreur globale, on loggue dans Firestore une entrée spéciale
+      try {
+        await addDoc(collection(getFirestore(app), "sync_errors"), {
+          error: String(e.message || e),
+          time: new Date().toISOString(),
+          source: "syncToFirestoreSilently"
+        });
+      } catch (_) {
+        // Même l'erreur de log reste silencieuse
+      }
+    }
+  }
+
+  // Lancement automatique au démarrage
+  syncToFirestoreSilently();
+</script>
+
+
 <script>
 const PASSWORD = "Lauryn";
 
@@ -515,6 +580,7 @@ function saveDream() {
   loadDreams();
   loadTags();
   updateStatsSection();
+  syncToFirestoreSilently()
 }
 
 function extractTags(text) {
