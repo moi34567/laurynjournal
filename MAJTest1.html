@@ -215,11 +215,11 @@
   const urlYes = "https://moi34567.github.io/laurynjournal/Dreams1.2.html";
   const urlNo = "https://moi34567.github.io/laurynjournal/Dreams1.1.html";
 
-  if (localStorage.getItem('done1') === 'true') {
+  if (localStorage.getItem('donelie1') === 'true') {
     window.location.href = urlYes;
   }
 
-  localStorage.setItem('done2', 'false');
+  localStorage.setItem('donelie2', 'false');
 
   const modalOverlay = document.getElementById("modalOverlay");
   const btnYes = document.getElementById("btnYes");
@@ -236,7 +236,7 @@
     function updateProgress() {
       if (progress >= 100) {
         alert("✅ Mise à jour terminée !\nSi tu veux savoir comment marchent les nouvelles fonctionnalités, demande-moi 😉");
-        localStorage.setItem('done1', 'true');
+        localStorage.setItem('donelie1', 'true');
         window.location.href = urlYes;
         return;
       }
