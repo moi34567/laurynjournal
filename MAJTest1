@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mise à jour</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #eee;
+    margin: 0; padding: 0;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  /* Fond modal */
+  #modalOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+  }
+  /* La pop-up */
+  #modal {
+    background: #222;
+    border-radius: 10px;
+    padding: 2rem;
+    max-width: 400px;
+    box-shadow: 0 0 15px #4CAF50;
+    text-align: center;
+  }
+  #modal h2 {
+    margin-top: 0;
+    color: #4CAF50;
+  }
+  #modal p {
+    margin: 1rem 0 2rem;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+  #modal button {
+    padding: 0.6rem 1.4rem;
+    margin: 0 0.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  #btnYes {
+    background-color: #4CAF50;
+    color: white;
+  }
+  #btnYes:hover {
+    background-color: #45a049;
+  }
+  #btnNo {
+    background-color: #e74c3c;
+    color: white;
+  }
+  #btnNo:hover {
+    background-color: #c0392b;
+  }
+  /* Écran de chargement */
+  #loadingScreen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #222;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 20;
+  }
+  #loadingText {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #4CAF50;
+  }
+  /* Barre de progression */
+  #progressBarContainer {
+    width: 80%;
+    background: #444;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 20px;
+  }
+  #progressBar {
+    height: 100%;
+    width: 0;
+    background: #4CAF50;
+    transition: width 0.1s linear;
+  }
+
+  /* Animation loader à points */
+  .container {
+    --uib-size: 50px;
+    --uib-color: #4CAF50;
+    --uib-speed: 1.5s;
+    --dot-size: calc(var(--uib-size) * 0.17);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: var(--uib-size);
+    width: var(--uib-size);
+    animation: smoothRotate calc(var(--uib-speed) * 1.8) linear infinite;
+    margin-top: 2rem;
+  }
+
+  .dot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    animation: rotate var(--uib-speed) ease-in-out infinite;
+  }
+
+  .dot::before {
+    content: '';
+    height: var(--dot-size);
+    width: var(--dot-size);
+    border-radius: 50%;
+    background-color: var(--uib-color);
+    transition: background-color 0.3s ease;
+  }
+
+  .dot:nth-child(2),
+  .dot:nth-child(2)::before {
+    animation-delay: calc(var(--uib-speed) * -0.835 * 0.5);
+  }
+
+  .dot:nth-child(3),
+  .dot:nth-child(3)::before {
+    animation-delay: calc(var(--uib-speed) * -0.668 * 0.5);
+  }
+
+  .dot:nth-child(4),
+  .dot:nth-child(4)::before {
+    animation-delay: calc(var(--uib-speed) * -0.501 * 0.5);
+  }
+
+  .dot:nth-child(5),
+  .dot:nth-child(5)::before {
+    animation-delay: calc(var(--uib-speed) * -0.334 * 0.5);
+  }
+
+  .dot:nth-child(6),
+  .dot:nth-child(6)::before {
+    animation-delay: calc(var(--uib-speed) * -0.167 * 0.5);
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    65%, 100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes smoothRotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+  <div id="modal">
+    <h2 id="modalTitle">Nouvelle mise à jour disponible !</h2>
+    <p id="modalDesc">
+      Voici les améliorations :<br>
+      - Amélioration du design du menu d'aide<br>
+      - Amélioration du fonctionnement du menu d'aide<br>
+      - Correction de bugs<br>
+      - Nouvelles fonctionnalités à venir
+    </p>
+    <button id="btnYes">Oui, installer</button>
+    <button id="btnNo">Non, plus tard</button>
+  </div>
+</div>
+
+<div id="loadingScreen" aria-live="polite" aria-busy="true" aria-label="Écran de chargement">
+  <div id="loadingText">Installation en cours...</div>
+  <div id="progressBarContainer">
+    <div id="progressBar"></div>
+  </div>
+  <div class="container">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+</div>
+
+<script>
+  const urlYes = "https://moi34567.github.io/laurynjournal/Dreams1.2.html";
+  const urlNo = "https://moi34567.github.io/laurynjournal/Dreams1.1.html";
+
+  if (localStorage.getItem('done1') === 'true') {
+    window.location.href = urlYes;
+  }
+
+  localStorage.setItem('done2', 'false');
+
+  const modalOverlay = document.getElementById("modalOverlay");
+  const btnYes = document.getElementById("btnYes");
+  const btnNo = document.getElementById("btnNo");
+  const loadingScreen = document.getElementById("loadingScreen");
+  const progressBar = document.getElementById("progressBar");
+
+  btnYes.addEventListener("click", () => {
+    modalOverlay.style.display = "none";
+    loadingScreen.style.display = "flex";
+
+    let progress = 0;
+
+    function updateProgress() {
+      if (progress >= 100) {
+        alert("✅ Mise à jour terminée !\nSi tu veux savoir comment marchent les nouvelles fonctionnalités, demande-moi 😉");
+        localStorage.setItem('done1', 'true');
+        window.location.href = urlYes;
+        return;
+      }
+
+      let increment = 0;
+      if (progress < 30) {
+        increment = Math.random() * 4 + 1;
+      } else if (progress < 70) {
+        increment = Math.random() * 2 + 0.5;
+      } else if (progress < 90) {
+        increment = Math.random() * 1 + 0.2;
+      } else if (progress < 98) {
+        increment = Math.random() * 0.5;
+      } else {
+        increment = Math.random() * 0.2;
+      }
+
+      progress = Math.min(progress + increment, 100);
+      progressBar.style.width = progress + "%";
+
+      const delay = 50 + Math.random() * 200;
+      setTimeout(updateProgress, delay);
+    }
+
+    updateProgress();
+  });
+
+  btnNo.addEventListener("click", () => {
+    window.location.href = urlNo;
+  });
+</script>
+
+</body>
+</html>
